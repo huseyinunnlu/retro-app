@@ -1,0 +1,41 @@
+name: Deploy to Netlify
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+        
+      - name: Install bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Netlify CLI
+        run: bun add -g netlify-cli
+        
+      - name: Install dependencies
+        run: bun install
+
+      - name: Deploy to Netlify (Production)
+        run: |
+          netlify env:set TELEGRAM_BOT_TOKEN ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          netlify env:set NODE_ENV production
+          netlify env:list
+          netlify deploy --prod
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}

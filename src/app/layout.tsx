@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import '@/styles/globals.css'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import ContextLayout from '@/components/Layouts/ContextLayout'
+import { Toaster } from '@/components/ui/sonner'
+import Link from 'next/link'
 
 interface RootLayoutProps {
     children: React.ReactNode
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
                 <ContextLayout>{children}</ContextLayout>
+                <Toaster expand={true} richColors />
             </body>
         </html>
     )

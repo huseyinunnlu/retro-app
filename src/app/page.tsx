@@ -1,10 +1,9 @@
-import { Button } from '@/components/ui/button'
+import { createClient } from '@/lib/supabase/server'
 import React from 'react'
 
-export default function Home() {
-    return (
-        <div>
-            <Button>Click me</Button>
-        </div>
-    )
+export default async function Home() {
+    const supabase = await createClient()
+    const { data } = await supabase.auth.getUser()
+
+    return <div>{JSON.stringify(data, null, 2)}</div>
 }

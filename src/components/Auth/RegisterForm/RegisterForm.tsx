@@ -1,31 +1,43 @@
 'use client'
 
 import { useForm } from 'react-hook-form'
-import { Button } from '@/components/ui/button'
 import { TextInputField } from '@/components/Shared/Form/TextInputField'
 import { Form } from '@/components/ui/form'
 import { registerSchema, RegisterFormTypes } from './data'
+import { register } from '@/actions/auth'
+import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 export default function RegisterForm() {
+    const router = useRouter()
     const form = useForm<RegisterFormTypes>({
         defaultValues: {
-            email: '',
-            firstName: '',
-            lastName: '',
-            password: '',
-            confirmPassword: '',
+            email: `test${Math.random()}@test.com`,
+            firstName: 'Test',
+            lastName: 'Test',
+            password: 'Test12..',
+            confirmPassword: 'Test12..',
         },
         resolver: registerSchema,
     })
 
-    const onSubmit = (data: RegisterFormTypes) => {
-        console.log(data)
+    const handleSubmit = async (formData: RegisterFormTypes) => {
+        const { error } = await register(formData)
+
+        if (error) {
+            toast.warning('Registration failed, please try again!')
+            return
+        }
+
+        toast.success('Registeration successful.')
+        router.push('/')
     }
 
     return (
         <Form {...form}>
             <form
-                onSubmit={form.handleSubmit(onSubmit)}
+                onSubmit={form.handleSubmit(handleSubmit)}
                 className="grid grid-cols-2 gap-4 w-2/3 max-sm:w-full"
             >
                 <TextInputField
@@ -63,8 +75,14 @@ export default function RegisterForm() {
                     placeholder="Confirm Password"
                     className="col-span-1"
                 />
-                <Button type="submit" className="col-span-2">
-                    Submit
+                <Button
+                    disabled={form.formState.isSubmitting}
+                    type="submit"
+                    className="col-span-2"
+                >
+                    {form.formState.isSubmitting
+                        ? 'Registering...'
+                        : 'Register'}
                 </Button>
             </form>
         </Form>

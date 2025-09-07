@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import LoginForm from '@/components/Auth/LoginForm/LoginForm'
 
 export default function Login() {
     return (
@@ -10,6 +11,7 @@ export default function Login() {
                     Login
                 </Link>
             </p>
+            <LoginForm />
         </div>
     )
 }

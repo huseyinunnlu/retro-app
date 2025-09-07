@@ -1,7 +1,7 @@
 import RegisterForm from '@/components/Auth/RegisterForm/RegisterForm'
 import Link from 'next/link'
 
-export default function Register() {
+export default async function Register() {
     return (
         <div className="w-full h-full flex flex-col items-center justify-center gap-4 p-4">
             <h2 className="text-3xl font-semibold">Register</h2>

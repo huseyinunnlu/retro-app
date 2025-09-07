@@ -14,9 +14,9 @@ export const registerSchema = zodResolver(
         .object({
             email: z.email(),
             firstName: z.string().min(1).max(100),
-            lastName: z.string().min(1).max(10),
-            password: z.string().min(1),
-            confirmPassword: z.string().min(1),
+            lastName: z.string().min(1).max(100),
+            password: z.string().min(6).max(100),
+            confirmPassword: z.string().min(6).max(100),
         })
         .refine((data) => data.password === data.confirmPassword, {
             path: ['confirmPassword'],

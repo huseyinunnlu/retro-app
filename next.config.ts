@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
             },
         ],
     },
+    target: 'serverless',
 }
 
 export default nextConfig

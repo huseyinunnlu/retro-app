@@ -71,9 +71,7 @@ export default function LoginForm() {
                     placeholder="Password"
                 />
                 <Button disabled={form.formState.isSubmitting} type="submit">
-                    {form.formState.isSubmitting
-                        ? 'Registering...'
-                        : 'Register'}
+                    {form.formState.isSubmitting ? 'Logging in...' : 'Login'}
                 </Button>
             </form>
         </Form>

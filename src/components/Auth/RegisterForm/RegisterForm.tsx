@@ -9,7 +9,12 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 
-export default function RegisterForm() {
+interface RegisterFormProps {
+    token: string | null
+    redirectTo: string | null
+}
+
+export default function RegisterForm({ token, redirectTo }: RegisterFormProps) {
     const router = useRouter()
     const form = useForm<RegisterFormTypes>({
         defaultValues: {
@@ -23,15 +28,17 @@ export default function RegisterForm() {
     })
 
     const handleSubmit = async (formData: RegisterFormTypes) => {
-        const { error } = await register(formData)
+        const result = await register(formData, token)
 
-        if (error) {
-            toast.warning('Registration failed, please try again!')
+        if (result?.error) {
+            toast.warning(result.error.message)
             return
         }
 
+        console.log(redirectTo)
+
         toast.success('Registeration successful.')
-        router.push('/')
+        router.push(redirectTo || '/')
     }
 
     return (

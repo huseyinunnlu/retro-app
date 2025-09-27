@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import '@/styles/globals.css'
-import ContextLayout from '@/components/Layouts/ContextLayout'
 import { Toaster } from '@/components/ui/sonner'
-import Link from 'next/link'
+import ProvidersRootLayout from '@/components/Layouts/ProvidersRootLayout'
 
 interface RootLayoutProps {
     children: React.ReactNode
@@ -30,7 +29,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
-                <ContextLayout>{children}</ContextLayout>
+                <ProvidersRootLayout>{children}</ProvidersRootLayout>
                 <Toaster expand={true} richColors />
             </body>
         </html>

@@ -1,7 +1,17 @@
 import RegisterForm from '@/components/Auth/RegisterForm/RegisterForm'
 import Link from 'next/link'
 
-export default async function Register() {
+interface RegisterProps {
+    searchParams: Promise<{
+        token: string | undefined | null
+        redirectTo: string | undefined | null
+    }>
+}
+
+export default async function Register({ searchParams }: RegisterProps) {
+    //get token from query params
+    const token = (await searchParams).token || null
+    const redirectTo = (await searchParams).redirectTo || null
     return (
         <div className="w-full h-full flex flex-col items-center justify-center gap-4 p-4">
             <h2 className="text-3xl font-semibold">Register</h2>
@@ -11,7 +21,7 @@ export default async function Register() {
                     Login
                 </Link>
             </p>
-            <RegisterForm />
+            <RegisterForm token={token} redirectTo={redirectTo} />
         </div>
     )
 }

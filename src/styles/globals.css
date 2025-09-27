@@ -120,4 +120,48 @@
     .bg-auth-background {
         @apply max-md:hidden bg-[url('/auth-page-background.png')] bg-cover bg-center;
     }
+
+    .container-7xl {
+        @apply w-full max-w-7xl mx-auto;
+    }
+
+    .container-6xl {
+        @apply w-full max-w-6xl mx-auto;
+    }
+
+    .container-5xl {
+        @apply w-full max-w-5xl mx-auto;
+    }
+
+    .container-4xl {
+        @apply w-full max-w-4xl mx-auto;
+    }
+
+    .container-3xl {
+        @apply w-full max-w-3xl mx-auto;
+    }
+
+    .container-2xl {
+        @apply w-full max-w-2xl mx-auto;
+    }
+
+    .container-xl {
+        @apply w-full max-w-xl mx-auto;
+    }
+
+    .container-lg {
+        @apply w-full max-w-lg mx-auto;
+    }
+
+    .container-md {
+        @apply w-full max-w-md mx-auto;
+    }
+
+    .container-sm {
+        @apply w-full max-w-sm mx-auto;
+    }
+
+    .container-xs {
+        @apply w-full max-w-xs mx-auto;
+    }
 }

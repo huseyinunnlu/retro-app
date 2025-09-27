@@ -27,6 +27,11 @@ export interface AddRetroComment {
     user_id: string
 }
 
+export interface ChangeColumnId {
+    commentId: string
+    newColumnId: string
+}
+
 export const useGetRetroTemplates = (filter: RetroTemplateFiter) => {
     return useQuery({
         queryKey: ['retro-templates', filter],
@@ -126,6 +131,22 @@ export const useDeleteRetroMutation = () => {
                 .from('retros')
                 .delete()
                 .eq('id', retroId)
+            if (error) throw error
+            return data
+        },
+    })
+}
+
+export const useChangeColumnIdMutation = () => {
+    return useMutation({
+        mutationKey: ['change-column-id'],
+        mutationFn: async (mutationData: ChangeColumnId) => {
+            console.log(mutationData)
+            const { data, error } = await supabase
+                .from('retro_comments')
+                .update({ column_id: mutationData.newColumnId })
+                .eq('id', mutationData.commentId)
+                .select()
             if (error) throw error
             return data
         },

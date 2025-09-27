@@ -1,7 +1,7 @@
 'use client'
 import supabase from '@/lib/supabase/client'
 import { Database } from '@/lib/supabase/schema'
-import { TemplateColumn } from '@/queries/retro'
+import { TemplateColumn, useChangeColumnIdMutation } from '@/queries/retro'
 import {
     createContext,
     ReactNode,
@@ -26,6 +26,7 @@ interface RetroContextProviderProps {
 interface RetroContextType {
     retroData: RetroData
     retroComments: Database['public']['Tables']['retro_comments']['Row'][]
+    changeCommentColumn: (commentId: string, newColumnId: string) => void
 }
 
 const RetroContext = createContext({})
@@ -37,6 +38,10 @@ export default function RetroContextProvider({
     const [retroComments, setRetroComments] = useState<
         Database['public']['Tables']['retro_comments']['Row'][]
     >(retroData.retro_comments || [])
+    const [lastUpdatedCommentId, setLastUpdatedCommentId] = useState<
+        string | null
+    >(null)
+    const changeColumnIdMutation = useChangeColumnIdMutation()
     useEffect(() => {
         if (!retroData.id) return
         const channel = supabase
@@ -57,6 +62,10 @@ export default function RetroContextProvider({
                         ])
                     }
                     if (payload.eventType === 'UPDATE') {
+                        if (payload.new?.id === lastUpdatedCommentId) {
+                            setLastUpdatedCommentId(null)
+                            return
+                        }
                         setRetroComments(
                             retroComments.map((comment) =>
                                 comment.id === payload.new?.id
@@ -81,8 +90,25 @@ export default function RetroContextProvider({
         }
     })
 
+    function changeCommentColumn(commentId: string, newColumnId: string) {
+        setLastUpdatedCommentId(commentId)
+        changeColumnIdMutation.mutate({
+            commentId,
+            newColumnId,
+        })
+        setRetroComments(
+            retroComments.map((comment) =>
+                comment.id === commentId
+                    ? { ...comment, column_id: newColumnId }
+                    : comment,
+            ),
+        )
+    }
+
     return (
-        <RetroContext.Provider value={{ retroData, retroComments }}>
+        <RetroContext.Provider
+            value={{ retroData, retroComments, changeCommentColumn }}
+        >
             {children}
         </RetroContext.Provider>
     )

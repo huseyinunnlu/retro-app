@@ -167,20 +167,18 @@ bun run lint
 
 ## 🚢 Deployment
 
-### Vercel (Recommended)
+### Netlify with GitHub Actions
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone)
+The application is deployed using Netlify CLI in GitHub Actions workflow.
 
-1. Connect your repository to Vercel
-2. Add environment variables
-3. Deploy automatically on every push to main
-
-### Docker
-
-```bash
-docker build -t retro-app .
-docker run -p 3000:3000 retro-app
-```
+1. Set up Netlify site and get your site ID
+2. Generate a Netlify auth token
+3. Add secrets to your GitHub repository:
+    - `NETLIFY_AUTH_TOKEN`
+    - `NETLIFY_SITE_ID`
+    - `NEXT_PUBLIC_SUPABASE_URL`
+    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+4. Push to main branch to trigger automatic deployment
 
 See [Deployment Guide](docs/technical/en/07-deployment.md) for detailed instructions.
 
@@ -203,17 +201,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - **Next.js** - For the amazing React framework
 - **Supabase** - For the powerful backend platform
 - **shadcn/ui** - For beautiful UI components
-- **Vercel** - For hosting and deployment
+- **Netlify** - For hosting and deployment
 - **Bun** - For fast JavaScript runtime
-
-## 📧 Support
-
-For support and questions:
-
-- 📖 Check the [documentation](docs/)
-- 🐛 Report bugs in [Issues](../../issues)
-- 💬 Join discussions in [Discussions](../../discussions)
-- 📧 Contact: your-email@example.com
 
 ## 🗺️ Roadmap
 

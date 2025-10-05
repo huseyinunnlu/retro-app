@@ -19,10 +19,12 @@ const eslintConfig = [
             'build/**',
             'next-env.d.ts',
         ],
-        rules: {
-            'react-hooks/exhaustive-deps': 'off',
-        },
     },
+    ...compat.config({
+        rules: {
+            'react-hooks/exhaustive-deps': 'warn',
+        },
+    }),
 ]
 
 export default eslintConfig

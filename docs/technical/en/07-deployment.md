@@ -6,19 +6,20 @@ This guide covers deploying the Retro App to production.
 
 The application is designed to be deployed on:
 
-- **Frontend**: Vercel (recommended) or any Node.js hosting
+- **Frontend**: Netlify with GitHub Actions
 - **Backend**: Supabase Cloud (managed service)
 - **Database**: PostgreSQL (via Supabase)
-- **CDN**: Vercel Edge Network or Cloudflare
+- **CDN**: Netlify Edge or Cloudflare
 
 ## Prerequisites
 
 Before deploying, ensure you have:
 
 - A Supabase project set up
-- A Vercel account (or alternative hosting)
+- A Netlify account
 - Git repository for the code
 - Environment variables configured
+- GitHub repository connected
 
 ## Supabase Setup
 
@@ -72,31 +73,31 @@ In Authentication settings:
 - Set site URL to your production domain
 - Add redirect URLs
 
-## Vercel Deployment
+## Netlify Deployment
 
 ### Initial Setup
 
-1. **Install Vercel CLI**:
+1. **Install Netlify CLI**:
 
 ```bash
-bun install -g vercel
+bun install -g netlify-cli
 ```
 
-2. **Login to Vercel**:
+2. **Login to Netlify**:
 
 ```bash
-vercel login
+netlify login
 ```
 
-3. **Link Project**:
+3. **Create New Site**:
 
 ```bash
-vercel link
+netlify init
 ```
 
 ### Configure Environment Variables
 
-In Vercel Dashboard → Settings → Environment Variables:
+In Netlify Dashboard → Site Settings → Environment Variables:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
@@ -106,136 +107,125 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 Or via CLI:
 
 ```bash
-vercel env add NEXT_PUBLIC_SUPABASE_URL production
-vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production
+netlify env:set NEXT_PUBLIC_SUPABASE_URL "https://your-project.supabase.co"
+netlify env:set NEXT_PUBLIC_SUPABASE_ANON_KEY "your-anon-key"
 ```
 
 ### Build Settings
 
-Vercel auto-detects Next.js. Default settings:
+Configure in `netlify.toml`:
 
-- **Framework Preset**: Next.js
-- **Build Command**: `bun run build`
-- **Output Directory**: `.next`
-- **Install Command**: `bun install`
-- **Development Command**: `bun run dev`
+```toml
+[build]
+  command = "bun run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+```
 
 ### Deploy
 
-**Production Deployment**:
+**Production Deployment via CLI**:
 
 ```bash
-vercel --prod
+netlify deploy --prod
 ```
 
 **Preview Deployment**:
 
 ```bash
-vercel
+netlify deploy
 ```
 
-### Automatic Deployments
+### Automatic Deployments with GitHub Actions
 
-Connect your Git repository:
+Create `.github/workflows/deploy.yml`:
 
-1. Go to Vercel Dashboard
-2. Import your Git repository
-3. Configure settings
-4. Every push to `main` triggers production deployment
-5. Every push to other branches creates preview deployments
+```yaml
+name: Deploy to Netlify
+
+on:
+    push:
+        branches: [main]
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v3
+
+            - uses: oven-sh/setup-bun@v1
+              with:
+                  bun-version: latest
+
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+
+            - name: Build
+              run: bun run build
+              env:
+                  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+                  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+            - name: Deploy to Netlify
+              uses: nwtgck/actions-netlify@v2
+              with:
+                  publish-dir: '.next'
+                  production-deploy: true
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  deploy-message: 'Deploy from GitHub Actions'
+              env:
+                  NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+                  NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+```
 
 ### Custom Domain
 
-1. Go to Project Settings → Domains
+1. Go to Site Settings → Domain Management
 2. Add your custom domain
 3. Configure DNS records as instructed
 4. SSL certificates are automatic
 
 ### Monitoring
 
-Vercel provides:
+Netlify provides:
 
-- **Logs**: Real-time function logs
-- **Analytics**: Page views and performance
-- **Speed Insights**: Web Vitals monitoring
-- **Error Tracking**: Runtime errors
+- **Logs**: Real-time deployment and function logs
+- **Analytics**: Page views and performance (Pro plan)
+- **Deploy previews**: Automatic preview deployments
+- **Split testing**: A/B testing capabilities
 
-## Alternative Hosting
+## Alternative Deployment Options
 
-### Docker Deployment
+### Manual Deployment
 
-Create `Dockerfile`:
+If you prefer manual deployments without GitHub Actions:
 
-```dockerfile
-FROM oven/bun:1 AS base
-
-# Install dependencies
-FROM base AS deps
-WORKDIR /app
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
-
-# Build application
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-ENV NEXT_TELEMETRY_DISABLED 1
-RUN bun run build
-
-# Production image
-FROM base AS runner
-WORKDIR /app
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
-
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-USER nextjs
-
-EXPOSE 3000
-ENV PORT 3000
-
-CMD ["bun", "server.js"]
-```
-
-Update `next.config.ts`:
-
-```typescript
-export default {
-    output: 'standalone',
-}
-```
-
-Build and run:
+1. Build locally:
 
 ```bash
-docker build -t retro-app .
-docker run -p 3000:3000 -e NEXT_PUBLIC_SUPABASE_URL=xxx -e NEXT_PUBLIC_SUPABASE_ANON_KEY=xxx retro-app
+bun run build
 ```
 
-### Node.js Hosting (Railway, Render, etc.)
+2. Deploy using Netlify CLI:
 
-1. Ensure `package.json` has start script:
-
-```json
-{
-    "scripts": {
-        "start": "next start"
-    }
-}
+```bash
+netlify deploy --prod
 ```
 
-2. Set environment variables in hosting dashboard
+### Branch Deploys
 
-3. Configure build command: `bun run build`
+Netlify automatically creates preview deployments for all branches:
 
-4. Configure start command: `bun run start`
+1. Push to any branch
+2. Netlify creates a unique preview URL
+3. Preview deployments don't affect production
+4. Perfect for testing before merging
 
 ## Performance Optimization
 
@@ -294,21 +284,21 @@ CREATE INDEX idx_comments_retro_id ON retro_comments(retro_id);
 
 ### 5. CDN Configuration
 
-Vercel automatically uses Edge Network. For custom CDN:
+Netlify automatically uses its global CDN. For additional optimization:
 
-1. Set up Cloudflare
-2. Configure caching rules
-3. Enable compression
-4. Use cache-control headers
+1. Enable Netlify Edge Functions (if needed)
+2. Configure cache-control headers
+3. Use Netlify's built-in asset optimization
+4. Consider Cloudflare for additional caching if needed
 
 ## Security Checklist
 
 - [ ] Environment variables are not committed to Git
 - [ ] Supabase service role key is kept secret
 - [ ] RLS policies are applied to all tables
-- [ ] HTTPS is enforced
+- [ ] HTTPS is enforced (Netlify provides automatic SSL)
 - [ ] CORS is configured correctly
-- [ ] Rate limiting is implemented (via Supabase or Vercel)
+- [ ] Rate limiting is implemented (via Supabase or Netlify Edge Functions)
 - [ ] SQL injection protection (Supabase handles this)
 - [ ] XSS protection (React handles this)
 - [ ] CSRF protection (Next.js handles this)
@@ -354,32 +344,23 @@ const logger = winston.createLogger({
 
 ### Analytics
 
-Add analytics to track user behavior:
+Add analytics to track user behavior. Options include:
 
-```typescript
-// app/layout.tsx
-import { Analytics } from '@vercel/analytics/react'
+- **Netlify Analytics**: Built-in server-side analytics (no client-side code required)
+- **Google Analytics**: Traditional analytics solution
+- **Plausible**: Privacy-focused analytics
+- **PostHog**: Open-source product analytics
 
-export default function RootLayout({ children }) {
-  return (
-    <html>
-      <body>
-        {children}
-        <Analytics />
-      </body>
-    </html>
-  )
-}
-```
+Enable Netlify Analytics in Site Settings → Analytics.
 
 ### Uptime Monitoring
 
 Use services like:
 
-- Vercel uptime monitoring
 - UptimeRobot
 - Pingdom
 - Betterstack
+- StatusCake
 
 ## Backup & Recovery
 
@@ -423,11 +404,12 @@ Supabase auto-scales compute:
 
 ### Application Scaling
 
-Vercel auto-scales:
+Netlify auto-scales:
 
 - Serverless functions scale automatically
-- Edge middleware runs globally
-- Static assets cached at edge
+- Edge functions run at the edge globally
+- Static assets cached at CDN edge nodes
+- Automatic load balancing
 
 ### Caching Strategy
 
@@ -438,62 +420,39 @@ Vercel auto-scales:
 
 ## CI/CD Pipeline
 
-### GitHub Actions Example
+### GitHub Actions Configuration
 
-Create `.github/workflows/deploy.yml`:
+The deployment workflow is already configured in the Netlify Deployment section above.
 
-```yaml
-name: Deploy to Production
+**Required GitHub Secrets:**
 
-on:
-    push:
-        branches: [main]
+- `NETLIFY_AUTH_TOKEN`: Your Netlify personal access token
+- `NETLIFY_SITE_ID`: Your site ID from Netlify
+- `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anon key
 
-jobs:
-    deploy:
-        runs-on: ubuntu-latest
+**To add secrets:**
 
-        steps:
-            - uses: actions/checkout@v3
-
-            - uses: oven-sh/setup-bun@v1
-              with:
-                  bun-version: latest
-
-            - name: Install dependencies
-              run: bun install --frozen-lockfile
-
-            - name: Run tests
-              run: bun test
-
-            - name: Build
-              run: bun run build
-              env:
-                  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-                  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-
-            - name: Deploy to Vercel
-              uses: amondnet/vercel-action@v20
-              with:
-                  vercel-token: ${{ secrets.VERCEL_TOKEN }}
-                  vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-                  vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-                  vercel-args: '--prod'
-```
+1. Go to your GitHub repository
+2. Navigate to Settings → Secrets and variables → Actions
+3. Click "New repository secret"
+4. Add each secret with its corresponding value
 
 ## Rollback Strategy
 
-### Vercel Rollback
+### Netlify Rollback
 
-1. Go to Deployments
-2. Find previous working deployment
-3. Click "Promote to Production"
+1. Go to Deploys in Netlify dashboard
+2. Find the last working deployment
+3. Click "Publish deploy" to rollback to that version
+4. Or use CLI: `netlify rollback`
 
 ### Database Rollback
 
 1. Use Supabase point-in-time recovery
 2. Or restore from manual backup
 3. Test in staging first
+4. Coordinate application and database rollbacks
 
 ## Environment Management
 
@@ -505,44 +464,54 @@ NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=local-dev-key
 ```
 
-### Staging
+### Staging/Preview
 
 ```bash
-# Vercel Preview
+# Netlify Deploy Preview
 NEXT_PUBLIC_SUPABASE_URL=https://staging-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=staging-key
 ```
 
+Configure context-specific environment variables in Netlify:
+
+- Deploy Preview context
+- Branch deploys context
+
 ### Production
 
 ```bash
-# Vercel Production
+# Netlify Production
 NEXT_PUBLIC_SUPABASE_URL=https://prod-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=prod-key
 ```
+
+Set in Netlify Dashboard → Site Settings → Environment Variables
 
 ## Troubleshooting
 
 ### Build Fails
 
-- Check build logs in Vercel
-- Verify environment variables
+- Check build logs in Netlify dashboard
+- Verify environment variables in Site Settings
 - Test build locally: `bun run build`
 - Check TypeScript errors: `bun tsc --noEmit`
+- Review Netlify function logs
 
 ### Runtime Errors
 
-- Check Vercel function logs
-- Check browser console
-- Review Sentry errors
-- Check Supabase logs
+- Check Netlify function logs in dashboard
+- Check browser console for client errors
+- Review Sentry errors (if configured)
+- Check Supabase logs for database issues
+- Use Netlify CLI: `netlify logs`
 
 ### Performance Issues
 
-- Use Vercel Speed Insights
-- Check database query performance
-- Review bundle size
-- Analyze loading times
+- Use Netlify Analytics (if enabled)
+- Check database query performance in Supabase
+- Review bundle size with Next.js analyzer
+- Analyze loading times with Lighthouse
+- Check CDN cache hit rates
 
 ### Database Connection Issues
 
@@ -573,5 +542,6 @@ Your Retro App is now deployed and ready for production use. Regular monitoring 
 For support and questions, refer to:
 
 - [Next.js Deployment Docs](https://nextjs.org/docs/deployment)
-- [Vercel Documentation](https://vercel.com/docs)
+- [Netlify Documentation](https://docs.netlify.com)
 - [Supabase Documentation](https://supabase.com/docs)
+- [Netlify CLI Documentation](https://cli.netlify.com)

@@ -27,6 +27,11 @@ export interface AddRetroComment {
     user_id: string
 }
 
+export interface ChangeColumnId {
+    commentId: string
+    newColumnId: string
+}
+
 export const useGetRetroTemplates = (filter: RetroTemplateFiter) => {
     return useQuery({
         queryKey: ['retro-templates', filter],
@@ -128,6 +133,49 @@ export const useDeleteRetroMutation = () => {
                 .eq('id', retroId)
             if (error) throw error
             return data
+        },
+    })
+}
+
+export const useChangeColumnIdMutation = () => {
+    return useMutation({
+        mutationKey: ['change-column-id'],
+        mutationFn: async (mutationData: ChangeColumnId) => {
+            console.log(mutationData)
+            const { data, error } = await supabase
+                .from('retro_comments')
+                .update({ column_id: mutationData.newColumnId })
+                .eq('id', mutationData.commentId)
+                .select()
+            if (error) throw error
+            return data
+        },
+    })
+}
+
+export const useUpdateRetroCommentMutation = () => {
+    return useMutation({
+        mutationKey: ['update-retro-comment'],
+        mutationFn: async (commentFormData: {
+            id: string
+            comment: string
+        }) => {
+            const { data, error } = await supabase
+                .from('retro_comments')
+                .update({
+                    comment: commentFormData.comment,
+                })
+                .eq('id', commentFormData.id)
+                .select()
+                .single()
+            if (error) throw error
+            return data
+        },
+        onError: () => {
+            toast.error('Failed to update retro comment')
+        },
+        onSuccess: () => {
+            toast.success('Retro comment updated successfully')
         },
     })
 }

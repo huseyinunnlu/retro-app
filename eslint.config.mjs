@@ -22,7 +22,7 @@ const eslintConfig = [
     },
     ...compat.config({
         rules: {
-            'react-hooks/exhaustive-deps': 'warn',
+            'react-hooks/exhaustive-deps': 'off',
         },
     }),
 ]

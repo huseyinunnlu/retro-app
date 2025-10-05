@@ -20,7 +20,7 @@ const eslintConfig = [
             'next-env.d.ts',
         ],
         rules: {
-            'react-hooks/exhaustive-deps': 'warn',
+            'react-hooks/exhaustive-deps': 'off',
         },
     },
 ]

@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { Dispatch, SetStateAction, useState } from 'react'
 import { Button } from '../ui/button'
 import { Plus, SendHorizonal, X } from 'lucide-react'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -10,41 +10,70 @@ import { Card, CardContent } from '../ui/card'
 import Image from 'next/image'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { Form } from '../ui/form'
-import { TemplateColumn, useAddRetroCommentMutation } from '@/queries/retro'
+import {
+    useAddRetroCommentMutation,
+    useUpdateRetroCommentMutation,
+} from '@/queries/retro'
 import { useRetroContext } from '@/contexts/RetroContext'
+import { Database } from '@/lib/supabase/schema'
 
-interface AddCommentFormType {
+interface CommentFormProps {
+    columnId: string
+    defaultComment?: Database['public']['Tables']['retro_comments']['Row']
+    setIsEditing?: Dispatch<SetStateAction<boolean>>
+}
+
+interface CommentFormType {
     comment: string
 }
 
-const validationSchema = zodResolver(
-    z.object({
-        comment: z.string().min(1),
-    }),
-)
-
-export default function AddComment({ column }: { column: TemplateColumn }) {
+export default function CommentForm({
+    columnId,
+    defaultComment,
+    setIsEditing,
+}: CommentFormProps) {
     const { user } = useAuthContext()
     const { retroData } = useRetroContext()
-    const [isCommentInputOpen, setIsCommentInputOpen] = useState(false)
-    const form = useForm<AddCommentFormType>({
+    const [isCommentInputOpen, setIsCommentInputOpen] = useState(
+        defaultComment ? true : false,
+    )
+    const form = useForm<CommentFormType>({
         defaultValues: {
-            comment: '',
+            comment: defaultComment?.comment || '',
         },
-        resolver: validationSchema,
+        resolver: zodResolver(
+            z.object({
+                comment: z
+                    .string()
+                    .min(1)
+                    .refine((comment) => comment !== defaultComment?.comment, {
+                        message:
+                            'Comment must be different from the previous comment',
+                    }),
+            }),
+        ),
     })
     const addRetroCommentMutation = useAddRetroCommentMutation()
+    const updateRetroCommentMutation = useUpdateRetroCommentMutation()
 
-    const onSubmit = async (data: AddCommentFormType) => {
+    const onSubmit = async (data: CommentFormType) => {
         if (!user?.id) return
-
-        await addRetroCommentMutation.mutateAsync({
-            comment: data.comment,
-            column_id: column.id,
-            retro_id: retroData.id,
-            user_id: user?.id,
-        })
+        if (defaultComment) {
+            await updateRetroCommentMutation.mutateAsync({
+                id: defaultComment.id,
+                comment: data.comment,
+            })
+        } else {
+            await addRetroCommentMutation.mutateAsync({
+                comment: data.comment,
+                column_id: columnId,
+                retro_id: retroData.id,
+                user_id: user?.id,
+            })
+        }
         form.reset()
+        setIsCommentInputOpen(false)
+        setIsEditing?.(false)
     }
 
     if (isCommentInputOpen) {
@@ -99,6 +128,7 @@ export default function AddComment({ column }: { column: TemplateColumn }) {
                                             className="size-8"
                                             onClick={() => {
                                                 setIsCommentInputOpen(false)
+                                                setIsEditing?.(false)
                                                 form.reset()
                                             }}
                                         >

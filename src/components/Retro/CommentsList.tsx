@@ -1,16 +1,17 @@
 'use client'
 import { Database } from '@/lib/supabase/schema'
-import React, { Ref } from 'react'
+import React, { Ref, useState } from 'react'
 import { Card, CardContent } from '../ui/card'
 import Image from 'next/image'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { Button } from '../ui/button'
-import { Trash2 } from 'lucide-react'
+import { Pencil, Trash2 } from 'lucide-react'
 import { useDeleteRetroCommentMutation } from '@/queries/retro'
 import { useDrag, useDrop } from 'react-dnd'
 import { DndItemTypes } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import { useRetroContext } from '@/contexts/RetroContext'
+import CommentForm from './CommentForm'
 
 interface CommentsListProps {
     comments: Database['public']['Tables']['retro_comments']['Row'][]
@@ -24,6 +25,7 @@ interface CommentItemProps {
 function CommentItem({ comment }: CommentItemProps) {
     const { user } = useAuthContext()
     const deleteRetroCommentMutation = useDeleteRetroCommentMutation()
+    const [isEditing, setIsEditing] = useState(false)
 
     const [{ isDragging }, drag] = useDrag(() => ({
         type: DndItemTypes.RETRO_COMMENT_CARD,
@@ -35,6 +37,17 @@ function CommentItem({ comment }: CommentItemProps) {
             isDragging: !!monitor.isDragging(),
         }),
     }))
+
+    if (isEditing) {
+        return (
+            <CommentForm
+                columnId={comment.column_id}
+                defaultComment={comment}
+                setIsEditing={setIsEditing}
+            />
+        )
+    }
+
     return (
         <Card
             className={cn(
@@ -64,22 +77,41 @@ function CommentItem({ comment }: CommentItemProps) {
                                 {`${comment.user_id === user?.id ? user?.user_metadata.firstName : 'Anonymous'}`}
                             </span>
                         </div>
-                        {(comment.user_id === user?.id ||
-                            user?.user_metadata.role === 'admin') && (
-                            <Button
-                                disabled={deleteRetroCommentMutation.isPending}
-                                variant="ghost"
-                                size="sm"
-                                className="size-6 ml-auto"
-                                onClick={() => {
-                                    deleteRetroCommentMutation.mutate(
-                                        comment.id,
-                                    )
-                                }}
-                            >
-                                <Trash2 className="size-4" />
-                            </Button>
-                        )}
+                        <div className="flex items-center gap-2 ml-auto">
+                            {(comment.user_id === user?.id ||
+                                user?.user_metadata.role === 'admin') && (
+                                <>
+                                    <Button
+                                        disabled={
+                                            deleteRetroCommentMutation.isPending
+                                        }
+                                        variant="ghost"
+                                        size="sm"
+                                        className="size-6"
+                                        onClick={() => {
+                                            deleteRetroCommentMutation.mutate(
+                                                comment.id,
+                                            )
+                                        }}
+                                    >
+                                        <Trash2 className="size-4" />
+                                    </Button>
+                                    <Button
+                                        disabled={
+                                            deleteRetroCommentMutation.isPending
+                                        }
+                                        variant="ghost"
+                                        size="sm"
+                                        className="size-6"
+                                        onClick={() => {
+                                            setIsEditing(true)
+                                        }}
+                                    >
+                                        <Pencil className="size-4" />
+                                    </Button>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
             </CardContent>

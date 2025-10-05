@@ -152,3 +152,30 @@ export const useChangeColumnIdMutation = () => {
         },
     })
 }
+
+export const useUpdateRetroCommentMutation = () => {
+    return useMutation({
+        mutationKey: ['update-retro-comment'],
+        mutationFn: async (commentFormData: {
+            id: string
+            comment: string
+        }) => {
+            const { data, error } = await supabase
+                .from('retro_comments')
+                .update({
+                    comment: commentFormData.comment,
+                })
+                .eq('id', commentFormData.id)
+                .select()
+                .single()
+            if (error) throw error
+            return data
+        },
+        onError: () => {
+            toast.error('Failed to update retro comment')
+        },
+        onSuccess: () => {
+            toast.success('Retro comment updated successfully')
+        },
+    })
+}

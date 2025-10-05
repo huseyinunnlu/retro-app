@@ -5,7 +5,7 @@ import React from 'react'
 import { Database } from '@/lib/supabase/schema'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { Button } from '../ui/button'
-import { Trash2 } from 'lucide-react'
+import { Trash2, Loader2 } from 'lucide-react'
 import { useDeleteRetroMutation } from '@/queries/retro'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -73,13 +73,18 @@ export default function RetroBoardsList({ retros }: RetroBoardsListProps) {
                                         variant="outline"
                                         size="icon"
                                         className="group-hover:flex hidden absolute top-2 right-2"
+                                        disabled={deleteRetroMutation.isPending}
                                         onClick={(e) => {
                                             e.preventDefault()
                                             e.stopPropagation()
                                             handleDeleteRetro(retro.id)
                                         }}
                                     >
-                                        <Trash2 className="size-4" />
+                                        {deleteRetroMutation.isPending ? (
+                                            <Loader2 className="size-4 animate-spin" />
+                                        ) : (
+                                            <Trash2 className="size-4" />
+                                        )}
                                     </Button>
                                 )}
                             </CardContent>

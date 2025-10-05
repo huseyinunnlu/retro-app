@@ -8,6 +8,7 @@ import { register } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import { Loader2 } from 'lucide-react'
 
 interface RegisterFormProps {
     token: string | null
@@ -87,6 +88,9 @@ export default function RegisterForm({ token, redirectTo }: RegisterFormProps) {
                     type="submit"
                     className="col-span-2"
                 >
+                    {form.formState.isSubmitting && (
+                        <Loader2 className="size-4 animate-spin" />
+                    )}
                     {form.formState.isSubmitting
                         ? 'Registering...'
                         : 'Register'}

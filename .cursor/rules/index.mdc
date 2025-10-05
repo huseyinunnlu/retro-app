@@ -1,0 +1,17 @@
+---
+alwaysApply: true
+---
+
+# Cursor Rules Index
+
+Use these rules to understand and navigate the project quickly. Each rule links to source files using the mdc: scheme.
+
+- Project Structure: [.cursor/rules/project-structure.mdc](mdc:.cursor/rules/project-structure.mdc)
+- Bun Usage and Tooling: [.cursor/rules/bun-usage.mdc](mdc:.cursor/rules/bun-usage.mdc)
+- Supabase Data Layer: [.cursor/rules/supabase-data-layer.mdc](mdc:.cursor/rules/supabase-data-layer.mdc)
+- Auth Flow and Routing: [.cursor/rules/auth-flow.mdc](mdc:.cursor/rules/auth-flow.mdc)
+- Retro Domain Guide: [.cursor/rules/retro-domain.mdc](mdc:.cursor/rules/retro-domain.mdc)
+- Contexts and Hooks Patterns: [.cursor/rules/contexts-hooks.mdc](mdc:.cursor/rules/contexts-hooks.mdc)
+- UI Components and Styling Conventions: [.cursor/rules/ui-conventions.mdc](mdc:.cursor/rules/ui-conventions.mdc)
+
+Tip: You can open any linked file directly from a rule.

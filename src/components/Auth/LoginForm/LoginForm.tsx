@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { login } from '@/actions/auth'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 export default function LoginForm() {
@@ -71,7 +71,11 @@ export default function LoginForm() {
                     placeholder="Password"
                 />
                 <Button disabled={form.formState.isSubmitting} type="submit">
-                    {form.formState.isSubmitting ? 'Logging in...' : 'Login'}
+                    {form.formState.isSubmitting ? (
+                        <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                        'Login'
+                    )}
                 </Button>
             </form>
         </Form>

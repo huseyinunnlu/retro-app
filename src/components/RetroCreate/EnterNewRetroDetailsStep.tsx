@@ -6,6 +6,7 @@ import Spinner from '../Shared/Spinner'
 import Image from 'next/image'
 import { TextInputField } from '../Shared/Form/TextInputField'
 import { Button } from '../ui/button'
+import { Loader2 } from 'lucide-react'
 
 export default function EnterNewRetroDetailsStep() {
     const form = useFormContext()
@@ -41,9 +42,11 @@ export default function EnterNewRetroDetailsStep() {
                 disabled={form.formState.isSubmitting}
                 className="w-auto inline-block"
             >
-                {form.formState.isSubmitting
-                    ? 'Creating Retro...'
-                    : 'Create Retro '}
+                {form.formState.isSubmitting ? (
+                    <Loader2 className="size-4 animate-spin" />
+                ) : (
+                    'Create Retro'
+                )}
             </Button>
         </div>
     )

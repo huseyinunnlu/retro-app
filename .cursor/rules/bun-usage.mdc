@@ -1,0 +1,38 @@
+---
+alwaysApply: true
+description: Bun usage instead of Node.js/npm/pnpm/vite
+globs: *
+---
+
+# Bun Usage in this Repository
+
+Follow these conventions when running, building, or testing.
+
+- Use `bun install` to install dependencies (not npm/pnpm/yarn)
+- Use `bun run <script>` to run scripts from [package.json](mdc:package.json)
+- Use `bun test` for tests (if present)
+- Use `bun <file>` instead of `node <file>`
+- Bun auto-loads `.env`; do not add `dotenv`
+
+Server APIs and Databases (if needed in tooling code):
+
+- Prefer `Bun.$` for shelling out
+- Prefer `Bun.file` over fs read/write
+
+This project is a Next.js app; you still use Next.js dev/build commands via Bun scripts, e.g. in [package.json](mdc:package.json):
+
+```json
+{
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start -p 3000"
+    }
+}
+```
+
+Run with:
+
+```bash
+bun run dev
+```

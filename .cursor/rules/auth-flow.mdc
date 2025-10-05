@@ -1,0 +1,35 @@
+---
+alwaysApply: false
+description: Authentication flow, middleware routing, login/register, and context provisioning
+globs: src/app/(auth)/**,src/middleware.ts,src/actions/auth.ts,src/contexts/AuthContext.tsx
+---
+
+# Authentication Flow and Routing
+
+Middleware
+
+- See [src/middleware.ts](mdc:src/middleware.ts):
+    - Public routes: `/login`, `/register`
+    - Redirects authenticated users away from auth pages
+    - Redirects unauthenticated users to `/login`
+    - Handles invite token on `/register?token=...&redirectTo=...`
+
+Server Actions
+
+- Auth actions: [src/actions/auth.ts](mdc:src/actions/auth.ts)
+    - `register(formData, token)` → creates or validates team and signs up
+    - `login(formData)` → `supabase.auth.signInWithPassword`
+    - `initUserData()` → resolves initial `user` and `team`
+
+App Router Integration
+
+- `(auth)` group: [src/app/(auth)/login/page.tsx](<mdc:src/app/(auth)/login/page.tsx>), [src/app/(auth)/register/page.tsx](<mdc:src/app/(auth)/register/page.tsx>)
+- `(main)` layout guards via `initUserData()` and redirects to `/login`
+    - [src/app/(main)/layout.tsx](<mdc:src/app/(main)/layout.tsx>)
+    - [src/app/(main)/(dashboard)/layout.tsx](<mdc:src/app/(main)/(dashboard)/layout.tsx>)
+
+Client Context
+
+- `AuthContextProvider`: [src/contexts/AuthContext.tsx](mdc:src/contexts/AuthContext.tsx)
+    - Listens for `SIGNED_OUT` events, resets state, and routes to `/login`
+    - Provides `user` and `team` to children

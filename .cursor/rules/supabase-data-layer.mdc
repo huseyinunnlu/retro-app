@@ -1,0 +1,32 @@
+---
+alwaysApply: false
+description: Supabase client patterns, SSR/CSR clients, and typed schema usage
+globs: *.ts,*.tsx
+---
+
+# Supabase Data Layer
+
+Clients
+
+- Server components/actions use: [src/lib/supabase/server.ts](mdc:src/lib/supabase/server.ts) `createClient()`
+- Client components/hooks use default client: [src/lib/supabase/client.ts](mdc:src/lib/supabase/client.ts)
+
+Typing
+
+- Import `Database` from [src/lib/supabase/schema.ts](mdc:src/lib/supabase/schema.ts)
+- Use `.overrideTypes<...>()` for joined selects in server actions when needed, see [src/actions/retro.ts](mdc:src/actions/retro.ts)
+
+Auth
+
+- Access `auth.getSession()`/`auth.getUser()` via the appropriate client.
+- Middleware gate: [src/middleware.ts](mdc:src/middleware.ts)
+
+Examples
+
+- Fetch retro by id (server): [src/actions/retro.ts](mdc:src/actions/retro.ts)
+- Team-scoped lists (server): [src/actions/retro.ts](mdc:src/actions/retro.ts)
+- Client mutations with hooks: [src/queries/retro.ts](mdc:src/queries/retro.ts)
+
+Environment
+
+- Reads `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` from env

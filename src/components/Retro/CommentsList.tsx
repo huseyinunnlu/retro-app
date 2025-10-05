@@ -5,7 +5,7 @@ import { Card, CardContent } from '../ui/card'
 import Image from 'next/image'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { Button } from '../ui/button'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Pencil, Trash2, Loader2 } from 'lucide-react'
 import { useDeleteRetroCommentMutation } from '@/queries/retro'
 import { useDrag, useDrop } from 'react-dnd'
 import { DndItemTypes } from '@/lib/constants'
@@ -94,7 +94,11 @@ function CommentItem({ comment }: CommentItemProps) {
                                             )
                                         }}
                                     >
-                                        <Trash2 className="size-4" />
+                                        {deleteRetroCommentMutation.isPending ? (
+                                            <Loader2 className="size-4 animate-spin" />
+                                        ) : (
+                                            <Trash2 className="size-4" />
+                                        )}
                                     </Button>
                                     <Button
                                         disabled={

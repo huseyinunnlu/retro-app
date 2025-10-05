@@ -1,7 +1,7 @@
 'use client'
 import React, { Dispatch, SetStateAction, useState } from 'react'
 import { Button } from '../ui/button'
-import { Plus, SendHorizonal, X } from 'lucide-react'
+import { Plus, SendHorizonal, X, Loader2 } from 'lucide-react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -143,7 +143,11 @@ export default function CommentForm({
                                                 !form.formState.isValid
                                             }
                                         >
-                                            <SendHorizonal className="size-4" />
+                                            {form.formState.isSubmitting ? (
+                                                <Loader2 className="size-4 animate-spin" />
+                                            ) : (
+                                                <SendHorizonal className="size-4" />
+                                            )}
                                         </Button>
                                     </div>
                                 </div>

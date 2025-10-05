@@ -1,0 +1,75 @@
+---
+alwaysApply: true
+description: Project structure overview and key entry points
+---
+
+# Project Structure
+
+This project uses Next.js App Router and Supabase. Start here to understand the layout.
+
+- Root config
+    - [package.json](mdc:package.json)
+    - [tsconfig.json](mdc:tsconfig.json)
+    - [eslint.config.mjs](mdc:eslint.config.mjs)
+    - [next.config.ts](mdc:next.config.ts)
+    - [postcss.config.mjs](mdc:postcss.config.mjs)
+    - [bun.lock](mdc:bun.lock)
+
+- App Router (pages, layouts, loading)
+    - Root layout: [src/app/layout.tsx](mdc:src/app/layout.tsx)
+    - Root loading: [src/app/loading.tsx](mdc:src/app/loading.tsx)
+    - Auth group: [src/app/(auth)/](<mdc:src/app/(auth)/>)
+        - Layout: [src/app/(auth)/layout.tsx](<mdc:src/app/(auth)/layout.tsx>)
+        - Login: [src/app/(auth)/login/page.tsx](<mdc:src/app/(auth)/login/page.tsx>)
+        - Register: [src/app/(auth)/register/page.tsx](<mdc:src/app/(auth)/register/page.tsx>)
+    - Main group: [src/app/(main)/](<mdc:src/app/(main)/>)
+        - Layout: [src/app/(main)/layout.tsx](<mdc:src/app/(main)/layout.tsx>)
+        - Dashboard group: [src/app/(main)/(dashboard)/](<mdc:src/app/(main)/(dashboard)/>)
+            - Layout: [src/app/(main)/(dashboard)/layout.tsx](<mdc:src/app/(main)/(dashboard)/layout.tsx>)
+            - Page: [src/app/(main)/(dashboard)/page.tsx](<mdc:src/app/(main)/(dashboard)/page.tsx>)
+        - Retro group: [src/app/(main)/(retro)/retro/[id]/](<mdc:src/app/(main)/(retro)/retro/[id]/>)
+            - Page: [src/app/(main)/(retro)/retro/[id]/page.tsx](<mdc:src/app/(main)/(retro)/retro/[id]/page.tsx>)
+            - Loading/NotFound: [loading.tsx](<mdc:src/app/(main)/(retro)/retro/[id]/loading.tsx>), [not-found.tsx](<mdc:src/app/(main)/(retro)/retro/[id]/not-found.tsx>)
+
+- Middleware (route protection and redirects)
+    - [src/middleware.ts](mdc:src/middleware.ts)
+
+- Supabase (client, server, schema)
+    - [src/lib/supabase/client.ts](mdc:src/lib/supabase/client.ts)
+    - [src/lib/supabase/server.ts](mdc:src/lib/supabase/server.ts)
+    - [src/lib/supabase/schema.ts](mdc:src/lib/supabase/schema.ts)
+
+- Actions (server actions)
+    - Auth: [src/actions/auth.ts](mdc:src/actions/auth.ts)
+    - Retro: [src/actions/retro.ts](mdc:src/actions/retro.ts)
+
+- Queries (client hooks, mutations)
+    - Auth: [src/queries/auth.ts](mdc:src/queries/auth.ts)
+    - Retro: [src/queries/retro.ts](mdc:src/queries/retro.ts)
+
+- Context Providers
+    - Auth: [src/contexts/AuthContext.tsx](mdc:src/contexts/AuthContext.tsx)
+    - Retro: [src/contexts/RetroContext.tsx](mdc:src/contexts/RetroContext.tsx)
+
+- Layout components
+    - Providers: [src/components/Layouts/ProvidersRootLayout.tsx](mdc:src/components/Layouts/ProvidersRootLayout.tsx), [src/components/Layouts/ProvidersMainLayout.tsx](mdc:src/components/Layouts/ProvidersMainLayout.tsx)
+    - Main Layout UI: [src/components/Layouts/Main/](mdc:src/components/Layouts/Main/)
+
+- UI primitives and shared components
+    - UI: [src/components/ui/](mdc:src/components/ui/)
+    - Shared Form: [src/components/Shared/Form/](mdc:src/components/Shared/Form/)
+
+- Retro domain components
+    - [src/components/Retro/](mdc:src/components/Retro/)
+    - Retro Create: [src/components/RetroCreate/](mdc:src/components/RetroCreate/)
+
+- Styles and public assets
+    - Global CSS: [src/styles/globals.css](mdc:src/styles/globals.css)
+    - Public assets: [public/](mdc:public/)
+
+Refer to the dedicated rules for deeper details:
+
+- [.cursor/rules/auth-flow.mdc](mdc:.cursor/rules/auth-flow.mdc)
+- [.cursor/rules/retro-domain.mdc](mdc:.cursor/rules/retro-domain.mdc)
+- [.cursor/rules/supabase-data-layer.mdc](mdc:.cursor/rules/supabase-data-layer.mdc)
+- [.cursor/rules/ui-conventions.mdc](mdc:.cursor/rules/ui-conventions.mdc)

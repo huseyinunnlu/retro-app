@@ -28,8 +28,9 @@ export default function RetroNotFound() {
                             Retro Not Found
                         </CardTitle>
                         <CardDescription className="text-base">
-                            The retrospective you're looking for doesn't exist
-                            or you don't have permission to view it.
+                            The retrospective you&apos;re looking for
+                            doesn&apos;t exist or you don&apos;t have permission
+                            to view it.
                         </CardDescription>
                     </div>
                 </CardHeader>
@@ -39,7 +40,10 @@ export default function RetroNotFound() {
                     </p>
                     <ul className="text-sm text-muted-foreground space-y-2 text-left list-disc list-inside">
                         <li>The retro has been deleted</li>
-                        <li>You don't have access to this team's retros</li>
+                        <li>
+                            You don&apos;t have access to this team&apos;s
+                            retros
+                        </li>
                         <li>The link you followed is incorrect</li>
                     </ul>
                 </CardContent>
